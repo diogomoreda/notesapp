@@ -1,0 +1,47 @@
+<div clickOutside (clickOutside)="onClickedOutside()" class="login-box">
+    <div *ngIf="!loggedIn">
+
+        <form class="login-form" (ngSubmit)="onLoginSubmit()">
+
+            <!-- USERNAME -->
+            <div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Username</mat-label>
+                    <input type="text" name="username" matInput [(ngModel)]="formData.username" required [disabled]="loading">
+                </mat-form-field>
+            </div>
+
+            <!-- PASSWORD -->
+            <div>    
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input type="text" name="password" matInput [(ngModel)]="formData.password" required
+                    [disabled]="loading">
+                </mat-form-field>    
+            </div>
+
+            <mat-error *ngIf="error">{{error}}</mat-error>
+
+            <button mat-flat-button color="primary" type="submit" [disabled]="loading">Login</button>
+
+            <div class="debug-data">
+                <div>User Type: <strong>typeA</strong></div>
+                <button (click)="fillForm('jon', 'password')" type="button">Jon</button>
+                <button (click)="fillForm('paul', 'password')" type="button">Paul</button>
+            </div>
+            <div class="debug-data">
+                <div>User Type: <strong>typeB</strong></div>
+                <button (click)="fillForm('peter', 'password')" type="button">Peter</button>
+                <button (click)="fillForm('mary', 'password')" type="button">Mary</button>
+            </div>
+
+
+        </form>
+        
+    </div>
+    <div *ngIf="loggedIn">
+        <form (ngSubmit)="onLogoutSubmit()">
+            <button type="submit" [disabled]="loading">Logout</button>
+        </form>
+    </div>
+</div>

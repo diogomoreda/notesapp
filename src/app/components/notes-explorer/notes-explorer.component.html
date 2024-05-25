@@ -1,0 +1,64 @@
+<div class="notes-explorer">
+
+    <div>
+
+        <button></button>
+
+        <form [formGroup]="searchForm">
+            
+            <mat-form-field>
+                <mat-label>Search:</mat-label>
+                <input matInput formControlName="stringSearchField">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Note Type:</mat-label>
+                <mat-select formControlName="selectedNoteType" name="selectedNoteType">
+                    <mat-option [value]=""></mat-option>
+                    @for (noteType of noteTypes; track noteType) {
+                        <mat-option [value]="noteType.value">{{noteType.label}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>User Type:</mat-label>
+                <mat-select formControlName="selectedUserType" name="selectedUserType">
+                    <mat-option [value]=""></mat-option>
+                    @for (userType of userTypes; track userType) {
+                        <mat-option [value]="userType.value">{{userType.label}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Order by:</mat-label>
+                <mat-select formControlName="selectedSort" name="selectedSort">
+                    @for (sortOption of sortOptions; track sortOption) {
+                        <mat-option [value]="sortOption.value">{{sortOption.label}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            
+            <mat-radio-group formControlName="selectedOrder">
+                <mat-radio-button *ngFor="let sortOrder of sortOrders" [value]="sortOrder.value">{{sortOrder.label}}</mat-radio-button>
+            </mat-radio-group>
+
+            <button mat-flat-button color="primary" type="button" (click)="clearFilters()"><mat-icon>clear</mat-icon></button>
+        </form>
+
+    </div>
+
+    <div class="note-board">
+        <div *ngFor="let note of notes; let i = index" class="note-icon">
+            <div>{{note.content[note.version].title}}</div>
+            <div>{{note.content[note.version].content}}</div>
+            <div>{{note.content[note.version].updated | date: 'fullDate'}}</div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+
+
+</div>

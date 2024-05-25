@@ -1,0 +1,30 @@
+.login-box {
+
+}
+
+.login-box button:not(:disabled):hover { cursor: pointer; }
+.login-box button:disabled:hover { cursor: not-allowed; }
+
+.login-form {
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    right: 24px;
+    width: 300px;
+    padding: 24px;
+    height: auto;
+    background-color: #fff;
+    filter: drop-shadow(3px 3px 3px #ccc);
+}
+
+
+.login-form .debug-data {
+    height: auto;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.login-form .debug-data > div {
+    padding: 6px;
+}

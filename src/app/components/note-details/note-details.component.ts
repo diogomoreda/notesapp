@@ -72,26 +72,6 @@ export class NoteDetailsComponent implements OnInit {
             contentField: new FormControl('', [Validators.required, Validators.maxLength(300)]),
         });
         this.mode = this.data.mode || 'view';
-        if (this.mode === 'add') {
-            this.note = this.createNote();
-            this.noteLink = this.getNoteLink(this.note.noteId);
-            this.hasAccess = true;
-            this.isOwner = true;
-            return;
-        }
-        this.apiNotesService.getById(+this.data.noteId)
-        .subscribe({
-            next: (note: INote | undefined) => {
-                if (!note) throw new Error('could not retrieve data')
-                this.note = note;
-                this.noteLink = this.getNoteLink(this.note.noteId);
-                this.hasAccess = this.authService.getAccess(this.note);
-                this.isOwner = this.authService.getOwnership(this.note);
-            },
-            error: (err: any) => {
-                console.error(err);
-            }
-        });
         this.apiUsersService.getAll(this.authService.getUser()?.userId)
         .subscribe({
             next: (users: IUser[]) => {
@@ -101,12 +81,26 @@ export class NoteDetailsComponent implements OnInit {
                 console.error(err);
             }
         })
-
-    }
-
-
-    private getNoteLink(noteId: number): string {
-        return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/note/${noteId}`;
+        if (this.mode === 'add') {
+            this.note = this.createNote();
+            this.noteLink = this.apiNotesService.getNoteLink(this.note.noteId);
+            this.hasAccess = true;
+            this.isOwner = true;
+            return;
+        }
+        this.apiNotesService.getById(+this.data.noteId)
+        .subscribe({
+            next: (note: INote | undefined) => {
+                if (!note) throw new Error('could not retrieve data')
+                this.note = note;
+                this.noteLink = this.apiNotesService.getNoteLink(this.note.noteId);
+                this.hasAccess = this.authService.getAccess(this.note);
+                this.isOwner = this.authService.getOwnership(this.note);
+            },
+            error: (err: any) => {
+                console.error(err);
+            }
+        });
     }
 
 
@@ -146,26 +140,15 @@ export class NoteDetailsComponent implements OnInit {
         this.actions[this.mode](this.note)
         .subscribe({
             next: () => {
+                if (this.mode === 'add') {
+                    this.dialogRef.close(true);
+                }
                 this.mode = 'view';
             },
             error: (err: any) => {
                 console.error(err)
             }
         })
-    }
-
-
-    openSharingDialog() {
-        const dialogRef = this.dialog.open(SharingDialogComponent, {
-            data: {
-                
-            }
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (Array.isArray(result)) {
-                //if (callback) callback();
-            }
-        })   
     }
 
 

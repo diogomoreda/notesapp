@@ -15,6 +15,10 @@ export class ServerService {
     // notesapp_users 
     // notesapp_data
 
+    private getNoteLink(noteId: number) {
+        return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/note/${noteId}`;
+    }
+
     reset(): IAllData {
         const users: IUser[] = [
             { userId: 1, username: 'jon', password: 'password' },
@@ -61,17 +65,17 @@ export class ServerService {
                 { title: 'What Mary has to do', content: 'feed the dog', imgUrl: '', noteType: 'todo', sharing: [], updated: new Date() },
             ]},
             { noteId: 12, userId: 4, version: 0, active: true, created: new Date(),  content: [
-                { title: 'Mary contact note', content: 'dog feeder: 99 999 999 999', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
+                { title: 'Mary contact note', content: ' dog feeder: 99 999 999 999', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
             ]},
 
             { noteId: 13, userId: 0, version: 0, active: true, created: new Date(),  content: [
-                { title: 'A Reminder from an unregistered user', content: '- remind me to finish the **unregistered** user list', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
+                { title: 'A Reminder from an unregistered user', content: `- remind me to finish the **unregistered** user list\n- link to [next post:](${this.getNoteLink(14)})`, imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
             ]},
             { noteId: 14, userId: 0, version: 0, active: true, created: new Date(),  content: [
-                { title: 'What some unregistered user has to do', content: 'I need to register into notes app', imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
+                { title: 'What some unregistered user has to do', content: `I need to register into notes app\n- link to [next post:](${this.getNoteLink(15)}) \n- link to [previous post:](${this.getNoteLink(13)})`, imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
             ]},
             { noteId: 15, userId: 0, version: 0, active: true, created: new Date(),  content: [
-                { title: 'Unregistered user contact note', content: 'registration contact: 99 999 999 999', imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
+                { title: 'Unregistered user contact note', content: `registration contact: 99 999 999 999\n- link to [previous post:](${this.getNoteLink(14)})`, imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
             ]},
             
         ];

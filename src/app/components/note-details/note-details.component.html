@@ -13,7 +13,7 @@
 
         <div class="content">
             <markdown>{{note.content[note.version].content}}</markdown>
-            <div class="contnt-image"></div>
+            <!--<div class="contnt-image"></div>-->
         </div>
 
         <footer>
@@ -84,8 +84,9 @@
                                 <mat-checkbox class="example-margin" color="primary" (change)="updateUserSharing($event, user)">{{user.username}}</mat-checkbox>
                             </li>
                         </ul>
-                    
-                        <div *ngFor="let userId of note.content[note.version].sharing">{{getUsername(userId)}}</div>
+                        <div *ngIf="mode === 'edit'">
+                            <div  *ngFor="let userId of note.content[note.version].sharing">{{getUsername(userId)}}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="note-revision">

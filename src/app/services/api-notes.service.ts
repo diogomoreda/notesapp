@@ -18,7 +18,15 @@ export class ApiNotesService {
 
     nextId(): number {
         const pool: INote[] = this.serverService.serverGetData();
-        return pool.length;
+        const noteIds: number[] = pool.map(i => i.noteId);
+        let counter: number = 1;
+        while (noteIds.includes(counter)) counter++;
+        return counter;
+    }
+
+    
+    public getNoteLink(noteId: number): string {
+        return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/note/${noteId}`;
     }
 
 

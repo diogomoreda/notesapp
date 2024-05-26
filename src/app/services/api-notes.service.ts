@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ServerService } from './server.service';
 import { AuthenticationService } from './authentication.service';
-import { Observable, map, of } from 'rxjs';
+import { Observable, catchError, filter, map, of } from 'rxjs';
 import { INote, INoteContent, INoteType } from '../types/INote-types';
 import { IUserType } from '../types/IUser-types';
 import { INoteSortOption, ISearchFilter, ISortOrder } from '../types/types';
@@ -16,22 +16,26 @@ export class ApiNotesService {
         private authService: AuthenticationService
     ) { }
 
-
-    getNoteContent(note: INote) {
-        const versionNumber = note.version || 0;
-        return note.content[versionNumber];
-    }
-
-    setNoteContent(note: INote, noteContent: INoteContent): INote {
-        noteContent.updated = new Date();
-        note.content.push(noteContent);
-        const versionNumber = note.content.length - 1;
-        note.version = versionNumber;
-        return note;
+    nextId(): number {
+        const pool: INote[] = this.serverService.serverGetData();
+        return pool.length;
     }
 
 
-    get(searchFilter: ISearchFilter): Observable<INote[]> {
+    getById(noteId: number): Observable<INote | undefined> {
+        return of(this.serverService.serverGetData())
+        .pipe(
+            map((notes: INote[]) => {
+                return notes.find((note: INote) => note.noteId === noteId);
+            }),
+            catchError((err: any) => {
+                return of(undefined)
+            }) 
+        );
+    }
+
+
+    getRequest(searchFilter: ISearchFilter): Observable<INote[]> {
         return of(this.serverService.serverGetData())
         .pipe(
             map((notes: INote[]) => {
@@ -46,7 +50,7 @@ export class ApiNotesService {
                 // filter by: userType
                 // filter by: noteType
                 
-                let filteredNotes: INote[] = notes;
+                let filteredNotes: INote[] = notes.filter((note: INote) => note.active );
 
                 if (!this.authService.isLoggedIn()) {
                     filteredNotes = filteredNotes.filter((note: INote) => !note.userId)
@@ -62,9 +66,7 @@ export class ApiNotesService {
                 if (searchFilter.noteType) {
                     filteredNotes = filteredNotes.filter((note: INote) => note.content[note.version].noteType && note.content[note.version].noteType === searchFilter.noteType)
                 }
-                if (searchFilter.userType) {
-                    filteredNotes = filteredNotes.filter((note: INote) => note.userType && note.userType === searchFilter.userType)
-                }
+                
 
                 // sort by: title alphabetically
                 // sort by: content alphabetically 
@@ -96,6 +98,58 @@ export class ApiNotesService {
                 if (searchFilter.sortOrder === 'desc') sortedNotes.reverse();
 
                 return sortedNotes;
+            })
+        );
+    }
+
+
+    postRequest(note: INote): Observable<boolean> {
+        return of(this.serverService.serverGetData()).pipe(
+            map((pool: INote[]) => {
+                pool.push(note);
+                this.serverService.serverSetData(pool);
+                return true;
+            }),
+            catchError((err: any) => {
+                return of(false);
+            })
+        );
+    }
+
+
+    patchRequest(updatedNote: INote): Observable<boolean> {
+        console.log(this)
+        return of(this.serverService.serverGetData()).pipe(
+            map((pool: INote[]) => {
+                const noteIndex = pool.findIndex(item => item.noteId === updatedNote.noteId);
+                if (noteIndex < 0) return false;
+                pool[noteIndex] = updatedNote;
+                this.serverService.serverSetData(pool);
+                return true;
+            }),
+            catchError((err: any) => {
+                return of(false);
+            })
+        );
+    }
+
+
+    deleteRequest(noteId: number | number[]): Observable<boolean> {
+        return of(this.serverService.serverGetData()).pipe(
+            map((pool: INote[]) => {
+                let noteIds: number[] = [];
+                if (!Array.isArray(noteId)) noteIds.push(noteId);
+                else noteIds = [...noteId];
+                for (let i=0; i<noteIds.length; i++) {
+                    const noteIndex = pool.findIndex((item: INote) => item.noteId === noteIds[i]);
+                    if (noteIndex < 0) return false;
+                    pool[noteIndex].active = false;
+                }
+                this.serverService.serverSetData(pool);
+                return true;
+            }),
+            catchError((err: any) => {
+                return of(false);
             })
         );
     }

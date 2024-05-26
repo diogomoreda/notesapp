@@ -1,0 +1,114 @@
+.note-details {
+    width: 480px;
+    min-height: 640px;
+    padding: 24px;
+    display: flex;
+    flex-flow: column;
+}
+
+.note-details .note-details-body {
+    display: flex;
+    flex-flow: column;
+    flex: 1
+}
+
+.note-details .note-details-body > header {
+    height: auto;
+}
+
+.note-details .note-details-body > .content {
+    position: relative;
+    display: flex;
+    flex: 1;
+}
+
+.note-details .note-details-body > .content > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.note-details .note-details-body > footer {
+    height: auto;
+}
+
+// text area
+.note-details .note-details-body > .content > div .mat-mdc-form-field {
+    width: 100%;
+    height: 100%;
+}
+
+// note footer details
+.note-details .note-details-body > footer .footer-control {
+    display: flex;
+    flex-flow: row;
+}
+.note-details .note-details-body > footer .footer-control > div {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+.note-details .note-details-body > footer .footer-control > div:first-child {
+    justify-content: flex-start;
+}
+.note-details .note-details-body > footer .footer-control > div:last-child {
+    justify-content: flex-end;
+}
+
+
+
+
+.note-details .note-details-body.note-details-warning {
+    justify-content: center;
+    align-items: center;
+    color: #CC0000;
+}
+
+
+
+.note-details footer > .footer-utils {
+    display: flex;
+    flex-flow: row;
+    margin-bottom: 24px;
+}
+
+.note-details .note-details-body footer > .footer-utils > div {
+    display: flex;
+    flex: 1;
+    flex-flow: column;
+    font-size: 12px;
+    overflow: hidden;
+    padding: 12px 0;
+}
+.note-details .note-details-body footer .footer-utils > .note-sharing {
+    border-right: 1px solid #ccc;
+    margin-right: 12px;
+}
+.note-details .note-details-body footer .footer-utils > .note-revision {
+    
+}
+.note-details .note-sharing .note-sharing-box,
+.note-details .note-revision .note-revision-box {
+    max-height: 100px;
+    overflow-y: auto;
+}
+.note-details .note-details-edit .note-revision .revision:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.note-details .note-details-body footer .footer-utils > .note-sharing ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+
+
+

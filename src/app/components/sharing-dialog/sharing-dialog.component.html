@@ -1,0 +1,19 @@
+<div class="sharing-dialog">
+
+    <header>
+        <h4>Share this note with other registered users</h4>
+    </header>
+
+    <div class="content">
+        <ul>
+            <li *ngFor="let user of users">
+                <mat-checkbox class="example-margin" color="primary" (change)="toggleUser($event, user)">{{user.username}}</mat-checkbox>
+            </li>
+        </ul>
+    </div>
+
+    <footer>
+        <button mat-flat-button color="primary" type="button" (click)="cancel()">Cancel</button>
+        <button mat-flat-button color="primary" type="button" (click)="confirm()">Confirm</button>
+    </footer>
+</div>

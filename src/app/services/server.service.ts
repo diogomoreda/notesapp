@@ -7,8 +7,7 @@ import { IAllData } from '../types/types';
 @Injectable({
     providedIn: 'root'
 })
-export class ServerService 
-{
+export class ServerService {
 
     constructor(
         private encryptionService: EncryptionService
@@ -18,61 +17,61 @@ export class ServerService
 
     reset(): IAllData {
         const users: IUser[] = [
-            { userId: 1, userType: 'typeA', username: 'jon', password: 'password' },
-            { userId: 2, userType: 'typeA', username: 'paul', password: 'password' },
-            { userId: 3, userType: 'typeB', username: 'peter', password: 'password' },
-            { userId: 4, userType: 'typeB', username: 'mary', password: 'password' },
+            { userId: 1, username: 'jon', password: 'password' },
+            { userId: 2, username: 'paul', password: 'password' },
+            { userId: 3, username: 'peter', password: 'password' },
+            { userId: 4, username: 'mary', password: 'password' },
         ];
 
         const data: INote[] = [
-            { noteId: 1, userId: 1, userType: 'typeA', version: 0, active: true, created: new Date(), content: [
-                { title: 'A Reminder from Jon', content: 'drink more water', imgUrl: '', noteType: 'reminder', public: true, updated: new Date() },
+            { noteId: 1, userId: 1, version: 0, active: true, created: new Date(), content: [
+                { title: 'A Reminder from Jon', content: 'drink more water', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
             ]},
-            { noteId: 2, userId: 1, userType: 'typeA', version: 0, active: true, created: new Date(),  content: [
-                { title: 'What Jon has to do', content: 'groceries, tours, folding', imgUrl: '', noteType: 'todo', public: true, updated: new Date() },
+            { noteId: 2, userId: 1, version: 0, active: true, created: new Date(),  content: [
+                { title: 'What Jon has to do', content: 'groceries, tours, folding', imgUrl: '', noteType: 'todo', sharing: [], updated: new Date() },
             ]},
-            { noteId: 3, userId: 1, userType: 'typeA', version: 0, active: true, created: new Date(),  content: [
-                { title: 'Jon contact note', content: 'mechanic: 99 999 999 999', imgUrl: '', noteType: 'contact', public: true, updated: new Date() },
-            ]},
-
-            { noteId: 4, userId: 2, userType: 'typeA', version: 0, active: true, created: new Date(),  content: [
-                { title: 'A Reminder from Paul', content: 'do more exercise', imgUrl: '', noteType: 'reminder', public: true, updated: new Date() },
-            ]},
-            { noteId: 5, userId: 2, userType: 'typeA', version: 0, active: true, created: new Date(),  content: [
-                { title: 'What Paul has to do', content: 'a lot', imgUrl: '', noteType: 'todo', public: true, updated: new Date() },
-            ]},
-            { noteId: 6, userId: 2, userType: 'typeA', version: 0, active: true, created: new Date(),  content: [
-                { title: 'Paul contact note', content: 'Susie: 99 999 999 999', imgUrl: '', noteType: 'contact', public: true, updated: new Date() },
+            { noteId: 3, userId: 1, version: 0, active: true, created: new Date(),  content: [
+                { title: 'Jon contact note', content: 'mechanic: 99 999 999 999', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
             ]},
 
-            { noteId: 7, userId: 3, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'A Reminder from Peter', content: 'fix the car', imgUrl: '', noteType: 'reminder', public: true, updated: new Date() },
+            { noteId: 4, userId: 2, version: 0, active: true, created: new Date(),  content: [
+                { title: 'A Reminder from Paul', content: 'do more exercise', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
             ]},
-            { noteId: 8, userId: 3, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'What Peter has to do', content: 'get mechanic contact', imgUrl: '', noteType: 'todo', public: true, updated: new Date() },
+            { noteId: 5, userId: 2, version: 0, active: true, created: new Date(),  content: [
+                { title: 'What Paul has to do', content: 'a lot', imgUrl: '', noteType: 'todo', sharing: [], updated: new Date() },
             ]},
-            { noteId: 9, userId: 3, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'Peter contact note', content: '', imgUrl: '', noteType: 'contact', public: true, updated: new Date() },
-            ]},
-
-            { noteId: 10, userId: 4, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'A Reminder from Mary', content: 'feed the dog', imgUrl: '', noteType: 'reminder', public: true, updated: new Date() },
-            ]},
-            { noteId: 11, userId: 4, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'What Mary has to do', content: 'feed the dog', imgUrl: '', noteType: 'todo', public: true, updated: new Date() },
-            ]},
-            { noteId: 12, userId: 4, userType: 'typeB', version: 0, active: true, created: new Date(),  content: [
-                { title: 'Mary contact note', content: 'dog feeder: 99 999 999 999', imgUrl: '', noteType: 'contact', public: true, updated: new Date() },
+            { noteId: 6, userId: 2, version: 0, active: true, created: new Date(),  content: [
+                { title: 'Paul contact note', content: 'Susie: 99 999 999 999', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
             ]},
 
-            { noteId: 13, userId: 0, userType: undefined, version: 0, active: true, created: new Date(),  content: [
-                { title: 'A Reminder from an unregistered user', content: 'remind me to finish the unregistered user list', imgUrl: '', noteType: 'reminder', public: true, updated: new Date() },
+            { noteId: 7, userId: 3, version: 0, active: true, created: new Date(),  content: [
+                { title: 'A Reminder from Peter', content: 'fix the car', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
             ]},
-            { noteId: 14, userId: 0, userType: undefined, version: 0, active: true, created: new Date(),  content: [
-                { title: 'What some unregistered user has to do', content: 'I need to register into notes app', imgUrl: '', noteType: undefined, public: true, updated: new Date() },
+            { noteId: 8, userId: 3, version: 0, active: true, created: new Date(),  content: [
+                { title: 'What Peter has to do', content: 'get mechanic contact', imgUrl: '', noteType: 'todo', sharing: [], updated: new Date() },
             ]},
-            { noteId: 15, userId: 0, userType: undefined, version: 0, active: true, created: new Date(),  content: [
-                { title: 'Unregistered user contact note', content: 'registration contact: 99 999 999 999', imgUrl: '', noteType: undefined, public: true, updated: new Date() },
+            { noteId: 9, userId: 3, version: 0, active: true, created: new Date(),  content: [
+                { title: 'Peter contact note', content: '', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
+            ]},
+
+            { noteId: 10, userId: 4, version: 0, active: true, created: new Date(),  content: [
+                { title: 'A Reminder from Mary', content: 'feed the dog', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
+            ]},
+            { noteId: 11, userId: 4, version: 0, active: true, created: new Date(),  content: [
+                { title: 'What Mary has to do', content: 'feed the dog', imgUrl: '', noteType: 'todo', sharing: [], updated: new Date() },
+            ]},
+            { noteId: 12, userId: 4, version: 0, active: true, created: new Date(),  content: [
+                { title: 'Mary contact note', content: 'dog feeder: 99 999 999 999', imgUrl: '', noteType: 'contact', sharing: [], updated: new Date() },
+            ]},
+
+            { noteId: 13, userId: 0, version: 0, active: true, created: new Date(),  content: [
+                { title: 'A Reminder from an unregistered user', content: '- remind me to finish the **unregistered** user list', imgUrl: '', noteType: 'reminder', sharing: [], updated: new Date() },
+            ]},
+            { noteId: 14, userId: 0, version: 0, active: true, created: new Date(),  content: [
+                { title: 'What some unregistered user has to do', content: 'I need to register into notes app', imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
+            ]},
+            { noteId: 15, userId: 0, version: 0, active: true, created: new Date(),  content: [
+                { title: 'Unregistered user contact note', content: 'registration contact: 99 999 999 999', imgUrl: '', noteType: undefined, sharing: [], updated: new Date() },
             ]},
             
         ];

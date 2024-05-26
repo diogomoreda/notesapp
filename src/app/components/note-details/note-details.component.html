@@ -1,0 +1,114 @@
+<div class="note-details">
+
+    <div *ngIf="!hasAccess" class="note-details-body note-details-warning">
+        <p>You do not have access to this note.</p>
+    </div>
+
+    <div *ngIf="hasAccess && mode === 'view'" class="note-details-body note-details-view">
+
+        <header>
+            <h3>{{note.content[note.version].title}}</h3>
+            <div>{{note.content[note.version].noteType}}</div>
+        </header>
+
+        <div class="content">
+            <markdown>{{note.content[note.version].content}}</markdown>
+            <div class="contnt-image"></div>
+        </div>
+
+        <footer>
+
+            <div>
+                <label>Link:</label>&nbsp;
+                <a href="{{noteLink}}" target="_blank">{{noteLink}}</a>
+            </div>
+
+            <div class="note-revision">
+                <div>
+                    <label>Last Update:</label>&nbsp;<span>{{note.content[note.version].updated | date: 'fullDate'}}</span>
+                </div>
+                <div>
+                    <label>Created:</label>&nbsp;<span>{{note.created | date: 'fullDate'}}</span>
+                </div>
+            </div>
+
+            <div class="footer-control">
+                <div>
+                    <button mat-flat-button color="primary" type="button" (click)="onEditClick()">Edit</button>
+                </div>
+            </div>
+            
+        </footer>
+
+    </div>
+
+
+    <form *ngIf="isOwner && (mode === 'add' || mode === 'edit')" [formGroup]="editForm" class="note-details-body note-details-edit">
+
+        <header>
+            <mat-form-field>
+                <mat-label>Title:</mat-label>
+                <input matInput formControlName="titleField">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Note Type:</mat-label>
+                <mat-select formControlName="selectedNoteType" name="selectedNoteType">
+                    <mat-option [value]=""></mat-option>
+                    @for (noteType of noteTypes; track noteType) {
+                        <mat-option [value]="noteType.value">{{noteType.label}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+        </header>
+
+        <div class="content">
+            <div>
+                
+                <mat-form-field appearance="fill">
+                    <mat-label>Content (Markdown supported)</mat-label>
+                    <textarea matInput placeholder="Enter your note contents here" rows="7" formControlName="contentField"></textarea>
+                </mat-form-field>
+
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-utils">
+                <div class="note-sharing">
+                    <div>Note Sharing:</div>
+                    <div class="note-sharing-box">
+                        <ul>
+                            <li *ngFor="let user of users">
+                                <mat-checkbox class="example-margin" color="primary" (change)="updateUserSharing($event, user)">{{user.username}}</mat-checkbox>
+                            </li>
+                        </ul>
+                    
+                        <div *ngFor="let userId of note.content[note.version].sharing">{{getUsername(userId)}}</div>
+                    </div>
+                </div>
+                <div class="note-revision">
+                    <div>Revisions:</div>
+                    <div class="note-revision-box">
+                        <div class="revision" *ngFor="let revision of note.content">
+                            <span (click)="loadRevision(revision)" title="click to load the content of this revision">{{revision.updated | date:'fullDate' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-control">
+                <div>
+                    <button mat-flat-button color="primary" type="button" (click)="onDeleteClick()" title="click to delete this note">Delete</button>
+                </div>
+                <div>
+                    <button mat-flat-button color="primary" type="button" (click)="onSaveClick()" title="click to save your changes">Save</button>
+                </div>
+            </div>
+            
+        </footer>
+
+    </form>
+
+
+</div>

@@ -1,0 +1,39 @@
+.sharing-dialog {
+    width: 480px;
+    min-height: 640px;
+    padding: 24px;
+    display: flex;
+    flex-flow: column;
+}
+
+.sharing-dialog > header {
+    height: auto;
+}
+
+.sharing-dialog > .content {
+    position: relative;
+    display: flex;
+    flex: 1;
+}
+
+.sharing-dialog > .content > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sharing-dialog > footer {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+}
+
+.sharing-dialog > footer button + button {
+    margin-left: 24px;
+}

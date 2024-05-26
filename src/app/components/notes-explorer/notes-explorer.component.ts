@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, SelectControlValueAccessor } from '@angular/forms'; // Import FormsModule
 import { Observable, combineLatest, debounceTime, distinctUntilChanged, map, merge, mergeAll } from 'rxjs';
 
+import { MatDialog } from '@angular/material/dialog';
 import { MatRadioModule, MatRadioGroup, MatRadioChange } from '@angular/material/radio'
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule} from '@angular/material/select';
@@ -10,10 +11,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { ApiNotesService } from '../../services/api-notes.service';
+import { NoteDetailsComponent } from '../note-details/note-details.component';
+
+import { noteTypes, userTypes, sortOptions, sortOrders } from '../../data/options';
 
 import { INote, INoteType } from '../../types/INote-types';
 import { INoteSortOption, ISearchFilter, ISortOrder } from '../../types/types';
 import { IUserType } from '../../types/IUser-types';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'notes-explorer',
@@ -28,39 +33,36 @@ export class NotesExplorerComponent implements OnInit
     searchForm!: FormGroup;
     searchFilter: ISearchFilter = {};
 
-    noteTypes = [
-        { value: 'reminder', label: 'Reminder' },
-        { value: 'todo', label: 'Todo' },
-        { value: 'contact', label: 'Contact' },
-    ];
-    userTypes = [
-        { value: 'typeA', label: 'Type A' },
-        { value: 'typeB', label: 'Type B' },
-    ];
-    sortOptions = [
-        { value: 'title', label: 'note title' },
-        { value: 'content', label: 'note content' },
-        { value: 'updated', label: 'last updated date' },
-        { value: 'created', label: 'creation date' }
-    ];
-    sortOrders = [
-        { value: 'asc', label: 'Ascending' },
-        { value: 'desc', label: 'Descending' }
-    ];
+    noteTypes = noteTypes;
+    userTypes = userTypes;
+    sortOptions = sortOptions;
+    sortOrders = sortOrders;
 
     
     constructor(
-        private apiNotesService: ApiNotesService
+        public dialog: MatDialog,
+        private route: ActivatedRoute,
+        private router: Router,
+        private apiNotesService: ApiNotesService,
     ) {}
 
 
     ngOnInit(): void {
-        this.getNotes();
-        this.initForm();
+        this.apiNotesService.getRequest(this.searchFilter)
+        .subscribe({
+            next: (response: INote[]) => {
+                this.notes = response;
+                this.initForm();
+                this.setupQueryParser();
+            },
+            error: (e: any) => {
+                console.error(e);
+            }
+        });
     }
 
 
-    initForm() {
+    private initForm() {
         this.searchForm = new FormGroup({
             stringSearchField: new FormControl('', []),
             selectedNoteType: new FormControl('', []),
@@ -95,9 +97,17 @@ export class NotesExplorerComponent implements OnInit
     }
 
 
-    getFilters() {
-        this.searchFilter = {};
+    private setupQueryParser() {
+        this.route.paramMap.subscribe(params => {
+            const noteId = params.get('id');
+            if (!noteId) return;
+            this.openNoteDialog(+noteId);
+        });
+    }
 
+
+    loadNoteDialog(noteId: number) {
+        this.router.navigate([`/note/${noteId}`], { queryParams: null });
     }
 
 
@@ -117,9 +127,9 @@ export class NotesExplorerComponent implements OnInit
     }
 
 
-    getNotes(): void {
-        console.log(this.searchFilter);
-        this.apiNotesService.get(this.searchFilter)
+    private getNotes(): void {
+        //console.log(this.searchFilter);
+        this.apiNotesService.getRequest(this.searchFilter)
         .subscribe({
             next: (response: INote[]) => {
                 this.notes = response;
@@ -129,5 +139,36 @@ export class NotesExplorerComponent implements OnInit
             }
         });
     }
+
+    
+    private openNoteDialog(noteId: number) {
+        const dialogRef = this.dialog.open(NoteDetailsComponent, {
+            data: {
+                mode: 'view',
+                noteId: noteId,
+            }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            this.router.navigate(['/'], { queryParams: null });
+            if (result === true) {
+                this.getNotes();
+            }
+        })   
+    }
+
+
+    onAddClick() {
+        const dialogRef = this.dialog.open(NoteDetailsComponent, {
+            data: {
+                mode: 'add'
+            }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result === true) {
+                this.getNotes();
+            }
+        })   
+    }
+    
 
 }

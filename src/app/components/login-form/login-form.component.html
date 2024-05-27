@@ -25,23 +25,19 @@
             <button mat-flat-button color="primary" type="submit" [disabled]="loading">Login</button>
 
             <div class="debug-data">
-                <div>User Type: <strong>typeA</strong></div>
+                <div>Debug helper:</div>
                 <button (click)="fillForm('jon', 'password')" type="button">Jon</button>
                 <button (click)="fillForm('paul', 'password')" type="button">Paul</button>
-            </div>
-            <div class="debug-data">
-                <div>User Type: <strong>typeB</strong></div>
                 <button (click)="fillForm('peter', 'password')" type="button">Peter</button>
                 <button (click)="fillForm('mary', 'password')" type="button">Mary</button>
             </div>
-
-
+            
         </form>
         
     </div>
     <div *ngIf="loggedIn">
         <form (ngSubmit)="onLogoutSubmit()">
-            <button type="submit" [disabled]="loading">Logout</button>
+            <button mat-flat-button type="submit" [disabled]="loading">Logout</button>
         </form>
     </div>
 </div>

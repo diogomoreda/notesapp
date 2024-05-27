@@ -13,94 +13,128 @@
 
         <div class="content">
             <markdown>{{note.content[note.version].content}}</markdown>
-            <!--<div class="contnt-image"></div>-->
+        </div>
+        <div *ngIf="encodedImg" class="content image-preview" [ngStyle]="{'background-image': encodedImgUrl }">
+
         </div>
 
         <footer>
-
+            <div *ngIf="createdBy">
+                <label>Created By:</label>
+                <span>{{createdBy}}</span>  
+            </div>
             <div>
-                <label>Link:</label>&nbsp;
+                <label>Creation Date:</label>
+                <span class="txt-dates">{{note.created | date: 'mediumDate'}} - {{note.created | date: 'mediumTime'}}</span>  
+            </div>
+            <div>
+                <label>Last Update:</label>
+                <span class="txt-dates">{{note.content[note.version].updated | date: 'mediumDate'}} - {{note.content[note.version].updated | date: 'mediumTime'}}</span>
+            </div>
+            <div *ngIf="note.content[note.version].sharing.length" class="note-sharing">
+                <label>Shared with:</label>
+                <div class="note-sharing-box">
+                    <ul>
+                        <li *ngFor="let sharing of note.content[note.version].sharing; let i = index;">
+                            <span>{{getUsername(sharing)}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <label>Link:</label>
                 <a href="{{noteLink}}" target="_blank">{{noteLink}}</a>
             </div>
 
-            <div class="note-revision">
-                <div>
-                    <label>Last Update:</label>&nbsp;<span>{{note.content[note.version].updated | date: 'fullDate'}}</span>
-                </div>
-                <div>
-                    <label>Created:</label>&nbsp;<span>{{note.created | date: 'fullDate'}}</span>
-                </div>
-            </div>
-
             <div class="footer-control">
-                <div>
+                <div *ngIf="isOwner">
                     <button mat-flat-button color="primary" type="button" (click)="onEditClick()">Edit</button>
                 </div>
+                <div *ngIf="!isOwner">
+                    <p>You are not allowed to edit notes shared with you. You may only edit notes created by yourself.</p>
+                </div>
             </div>
-            
         </footer>
-
     </div>
 
 
-    <form *ngIf="isOwner && (mode === 'add' || mode === 'edit')" [formGroup]="editForm" class="note-details-body note-details-edit">
+    <div *ngIf="isOwner && (mode === 'add' || mode === 'edit')" class="note-details-body note-details-edit">
 
-        <header>
-            <mat-form-field>
-                <mat-label>Title:</mat-label>
-                <input matInput formControlName="titleField">
-            </mat-form-field>
+        <form [formGroup]="editForm" class="note-details-body note-details-edit">
 
-            <mat-form-field>
-                <mat-label>Note Type:</mat-label>
-                <mat-select formControlName="selectedNoteType" name="selectedNoteType">
-                    <mat-option [value]=""></mat-option>
-                    @for (noteType of noteTypes; track noteType) {
-                        <mat-option [value]="noteType.value">{{noteType.label}}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-
-        </header>
-
-        <div class="content">
-            <div>
-                
-                <mat-form-field appearance="fill">
-                    <mat-label>Content (Markdown supported)</mat-label>
-                    <textarea matInput placeholder="Enter your note contents here" rows="7" formControlName="contentField"></textarea>
+            <header>
+                <mat-form-field>
+                    <mat-label>Title:</mat-label>
+                    <input matInput formControlName="titleField">
                 </mat-form-field>
 
+                <mat-form-field>
+                    <mat-label>Note Type:</mat-label>
+                    <mat-select formControlName="selectedNoteType" name="selectedNoteType">
+                        <mat-option [value]=""></mat-option>
+                        @for (noteType of noteTypes; track noteType) {
+                            <mat-option [value]="noteType.value">{{noteType.label}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+            </header>
+
+            <div class="content">
+                <div>
+                    
+                    <mat-form-field appearance="fill">
+                        <mat-label>Content (Markdown supported)</mat-label>
+                        <textarea matInput placeholder="Enter your note contents here" rows="7" formControlName="contentField"></textarea>
+                    </mat-form-field>
+
+                </div>
             </div>
-        </div>
+
+            <div class="file-input">
+                <div class="field">
+                    <div><mat-label>choose a file to upload</mat-label></div>
+                    <div><input type="file" (change)="onFileChange($event)"></div>
+                </div>
+                <div class="placeholder">
+                    <img *ngIf="encodedImg" [src]="encodedImg" alt="image uploaded for this note">
+                </div>
+            </div>
+
+        </form>
 
         <footer>
+            
             <div class="footer-utils">
+
                 <div class="note-sharing">
-                    <div>Note Sharing:</div>
-                    <div class="note-sharing-box">
+                    <div class="note-sharing-label">Note Sharing:</div>
+                    <div class="note-sharing-box" *ngIf="isLoggedIn">
                         <ul>
-                            <li *ngFor="let user of users">
-                                <mat-checkbox class="example-margin" color="primary" (change)="updateUserSharing($event, user)">{{user.username}}</mat-checkbox>
+                            <li *ngFor="let user of sharingList; let i = index;">
+                                <input type="checkbox" [(ngModel)]="user.selected"> {{user.username}}
                             </li>
                         </ul>
-                        <div *ngIf="mode === 'edit'">
-                            <div  *ngFor="let userId of note.content[note.version].sharing">{{getUsername(userId)}}</div>
-                        </div>
+                    </div>
+                    <div class="note-sharing-box" *ngIf="!isLoggedIn">
+                        <p>Only logged in users may share their notes with other registered users.</p>
                     </div>
                 </div>
+
                 <div class="note-revision">
                     <div>Revisions:</div>
                     <div class="note-revision-box">
                         <div class="revision" *ngFor="let revision of note.content">
-                            <span (click)="loadRevision(revision)" title="click to load the content of this revision">{{revision.updated | date:'fullDate' }}</span>
+                            <span (click)="loadRevision(revision)" title="click to load the content of this revision">{{revision.updated | date:'mediumDate' }}&nbsp;-&nbsp;{{revision.updated | date:'mediumTime' }}</span>
                         </div>
                     </div>
                 </div>
+
             </div>
+
             <div class="footer-control">
                 <div>
-                    <button mat-flat-button color="primary" type="button" (click)="onDeleteClick()" title="click to delete this note">Delete</button>
+                    <button *ngIf="mode === 'edit'" mat-flat-button color="primary" type="button" (click)="onDeleteClick()" title="click to delete this note">Delete</button>
                 </div>
                 <div>
                     <button mat-flat-button color="primary" type="button" (click)="onSaveClick()" title="click to save your changes">Save</button>
@@ -109,7 +143,7 @@
             
         </footer>
 
-    </form>
+    </div>
 
 
 </div>

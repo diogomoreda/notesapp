@@ -11,13 +11,15 @@ export interface ILoginCredentials {
     password: string;
 }
 
+export type IAccessType = 'public' | 'shared' | 'private'
+
 export type ISortOrder = 'asc' | 'desc';
 export type INoteSortOption = 'title' | 'content' | 'updated' | 'created';
 
 export interface ISearchFilter {
     searchStr?: string;
     noteType?: INoteType;
-    userType?: IUserType;
+    accessType?: IAccessType;
     sortOption?: INoteSortOption; 
     sortOrder?: ISortOrder;
 }

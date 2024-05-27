@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ServerService } from './server.service';
 import { IUser, IUserType } from '../types/IUser-types';
 import { ILoginCredentials } from '../types/types';
-import { Observable, map, of } from 'rxjs';
+import { Observable, Subject, map, of } from 'rxjs';
 import { INote } from '../types/INote-types';
 
 @Injectable({
@@ -10,16 +10,25 @@ import { INote } from '../types/INote-types';
 })
 export class AuthenticationService {
 
-    private loggedIn: boolean | undefined = undefined;
-    private user: IUser | undefined;
+    private loggedIn: boolean | null = null;
+    private user: IUser | null;
+
+    private loginSubject: Subject<boolean> = new Subject<boolean>();
+    login$: Observable<boolean> = this.loginSubject.asObservable();
+    emitLoginState(state: boolean) {
+        this.loginSubject.next(state);
+    }
     
 
     constructor(
         private serverService: ServerService,
-    ) {}
+    ) {
+        this.user = this.serverService.serverGetUser();
+        this.loggedIn = this.user !== null;
+    }
 
 
-    getUser(): IUser | undefined {
+    getUser(): IUser | null {
         return this.user;
     }
 
@@ -30,10 +39,13 @@ export class AuthenticationService {
 
 
     getAccess(note: INote): boolean {
-        if (!note.userId) return true; // no userId in note, this is a public note
-        if (!this.user) return false;        // the note has an Id, the current user must be  
-        if (!this.user.userId) return false; // an authenticated user so it can view the note
-        return true;    // the user is authenticated, access is granted
+        if (!note.userId) return true;                                      // no userId in note, this is a public note so it can be accessed by anyone
+        if (!this.user) return false;                                       // the note has an Id, the current user must be  
+        if (!this.user.userId) return false;                                // an authenticated user so it can view the note
+        if (note.userId === this.user.userId) return true;                  // the user is the owner, so it has access
+        if (note.content[note.version].sharing.includes(this.user.userId))  // the note has been shared with this user, so it has access
+            return true;
+        return false;    // none of the above? no access then
     }
 
 
@@ -56,11 +68,15 @@ export class AuthenticationService {
                 );
                 if (!result) {
                     this.loggedIn = false;
-                    this.user = undefined;
+                    this.user = null;
+                    this.serverService.serverClearUser();
+                    this.emitLoginState(false);
                     return false;
                 }
                 this.loggedIn = true;
                 this.user = result;
+                this.serverService.serverSetUser(this.user);
+                this.emitLoginState(true);
                 return true;
             }) 
         );
@@ -71,7 +87,9 @@ export class AuthenticationService {
         return of(null).pipe(
             map(() => {
                 this.loggedIn = false;
-                this.user = undefined;
+                this.user = null;
+                this.serverService.serverClearUser();
+                this.emitLoginState(false);
             })
         );
     }

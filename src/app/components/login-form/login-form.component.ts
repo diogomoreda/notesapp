@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideDirective } from '../../directives/click-outside.directive';
+import { GlobalService } from '../../services/global.service';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { ILoginCredentials } from '../../types/types';
 import { AuthenticationService } from '../../services/authentication.service';
+
 
 
 @Component({
@@ -34,7 +36,8 @@ export class LoginFormComponent
     loggedIn: boolean = false;
     
     constructor(
-        private authService: AuthenticationService
+        private authService: AuthenticationService,
+        private globalService: GlobalService,
     ) { }
 
     ngOnInit(): void {
@@ -59,6 +62,7 @@ export class LoginFormComponent
             next: (loginResponse: boolean) => {
                 if (loginResponse) {
                     this.clickOutsideEmitter.emit();
+                    this.globalService.reload();
                 }
             },
             error: (error: any) => {
@@ -74,16 +78,14 @@ export class LoginFormComponent
         this.loading = true;
         this.authService.logout().subscribe({
             next: () => {
-                
+                this.loading = false;
+                this.initForm();
+                this.clickOutsideEmitter.emit();
+                this.globalService.reload();
             },
             error: (error: any) => {
                 this.error = error.message;
                 this.loading = false;
-            },
-            complete: () => {
-                this.loading = false;
-                this.initForm();
-                this.clickOutsideEmitter.emit();
             }
         })
     }

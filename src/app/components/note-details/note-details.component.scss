@@ -70,6 +70,15 @@
 }
 
 
+.note-details .note-details-edit > form {
+    display: flex;
+    flex-flow: column;
+    flex: 1;
+}
+
+.note-details .note-details-body footer > div {
+    margin-bottom: 6px;
+}
 
 .note-details footer > .footer-utils {
     display: flex;
@@ -97,17 +106,83 @@
     max-height: 100px;
     overflow-y: auto;
 }
+.note-details footer label {
+    font-size: 12px;
+    margin-right: 6px;
+}
+.note-details .note-revision .txt-dates {
+    font-size: 13px;
+}
 .note-details .note-details-edit .note-revision .revision:hover {
     text-decoration: underline;
     cursor: pointer;
 }
-.note-details .note-details-body footer .footer-utils > .note-sharing ul {
+.note-details .note-sharing ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
+.note-details .note-sharing input[type=checkbox] {
+    cursor: pointer;
+}
+
+.note-details .note-details-view .footer-control p {
+    color: #673ab7;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    padding: 6px;
+}
+
+// Note Sharing in View mode
+.note-details .note-details-view .note-sharing {
+    display: flex;
+    flex-flow: row;
+}
+.note-details .note-details-view .note-sharing .note-sharing-label {
+    display: flex;
+    width: auto;
+    margin-right: 12px;
+}
+.note-details .note-details-view .note-sharing .note-sharing-box {
+    display: flex;
+    flex: 1;
+}
+.note-details .note-details-view .note-sharing ul li { 
+    display: inline-block; width: auto; margin-right: 6px; margin-bottom: 0px;
+}
+.note-details .note-details-view .note-sharing ul li:not(:last-child):after {
+    content: ","
+} 
+
+.note-details .file-input {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    flex-flow: row;
+}
+.note-details .file-input > div {
+    display: flex;
+    flex: 1;
+}
+.note-details .file-input .field {
+    display: flex;
+    flex-flow: column;
+}
+.note-details .file-input img {
+    max-width: 100px;
+    height: auto;
+    max-height: 100px;
+}
 
 
+.note-details .image-preview {
+    background-size: fit;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 12px 0;
+}
 
 
 

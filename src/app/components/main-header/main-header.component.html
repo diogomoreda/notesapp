@@ -6,7 +6,7 @@
         
         @if (!isLoggedIn()) {
             @if (!displayLoginForm) {
-                <button (click)="toggleLoginFormDisplay($event)">Login</button>
+                <button mat-flat-button (click)="toggleLoginFormDisplay($event)">Login</button>
             }
         }
         @if (isLoggedIn() || displayLoginForm) {

@@ -5,9 +5,10 @@ export const noteTypes = [
     { value: 'contact', label: 'Contact' },
 ];
 
-export const userTypes = [
-    { value: 'typeA', label: 'Type A' },
-    { value: 'typeB', label: 'Type B' },
+export const accessTypes = [
+    { value: 'private', label: 'Created by me' },
+    { value: 'shared', label: 'Shared with me' },
+    { value: 'public', label: 'Public' },
 ];
 
 export const sortOptions = [

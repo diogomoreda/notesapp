@@ -6,5 +6,11 @@ export interface IUser {
     password?: string;
 } 
 
+export interface IUserShareOption {
+    userId: number;
+    username: string;
+    selected: boolean;
+}
+
 
 

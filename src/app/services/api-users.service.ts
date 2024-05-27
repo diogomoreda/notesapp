@@ -35,9 +35,9 @@ export class ApiUsersService {
         .pipe(
             map((users: IUser[]) => {
                 return users
-                        .filter((user: IUser) => user.userId !== excludeId)
+                        //.filter((user: IUser) => user.userId !== excludeId)
                         .map((user: IUser) => (
-                            { userId: user.userId, username: user.username }
+                            { userId: user.userId, username: user.userId !== excludeId ? user.username : 'you'}
                         ));
             }),
             catchError((err: any) => {

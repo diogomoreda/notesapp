@@ -175,15 +175,12 @@
     height: auto;
     max-height: 100px;
 }
-
-
+.note-details .file-input .field mat-label {
+    word-break: break-word;
+}
 .note-details .image-preview {
     background-size: fit;
     background-position: center;
     background-repeat: no-repeat;
     margin: 12px 0;
 }
-
-
-
-

@@ -3,15 +3,13 @@
         <h1>{{title}}</h1>
     </div>
     <div class="col-right">
-        
         @if (!isLoggedIn()) {
             @if (!displayLoginForm) {
-                <button mat-flat-button (click)="toggleLoginFormDisplay($event)">Login</button>
+                <button mat-flat-button (click)="toggleLoginFormDisplay($event)" title="click to open the login form">Login</button>
             }
         }
         @if (isLoggedIn() || displayLoginForm) {
             <login-form (clickOutsideEmitter)="hideLoginForm()"></login-form>
         }
-        
     </div>
 </header>

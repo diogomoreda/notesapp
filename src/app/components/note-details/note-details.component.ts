@@ -1,16 +1,11 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { INote, INoteContent } from '../../types/INote-types';
-import { MarkdownModule } from 'ngx-markdown';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
 import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, SelectControlValueAccessor, Validators, FormArray } from '@angular/forms'; // Import FormsModule
-import { Observable, combineLatest, debounceTime, distinctUntilChanged, map, merge, mergeAll } from 'rxjs';
-import { noteTypes, accessTypes } from '../../data/options';
+import { Observable, Subscription, combineLatest, debounceTime, distinctUntilChanged, map, merge, mergeAll } from 'rxjs';
+import { MarkdownModule } from 'ngx-markdown';
 
-import { MaxUploadFileSize, MaxNoteTitleLength, MaxNoteContentLength } from '../../configuration/configuration';
-
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { MatRadioModule, MatRadioGroup, MatRadioChange } from '@angular/material/radio'
 import { MatInputModule } from '@angular/material/input';
@@ -18,14 +13,17 @@ import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox
 import { MatSelectChange, MatSelectModule} from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Title } from '@angular/platform-browser';
-import { ApiNotesService } from '../../services/api-notes.service';
-import { AuthenticationService } from '../../services/authentication.service';
-import { IUser, IUserShareOption } from '../../types/IUser-types';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { SharingDialogComponent } from '../sharing-dialog/sharing-dialog.component';
+
+import { MaxUploadFileSize, MaxNoteTitleLength, MaxNoteContentLength } from '../../configuration/configuration';
+import { noteTypes } from '../../configuration/configuration';
 import { ApiUsersService } from '../../services/api-users.service';
 import { ServerService } from '../../services/server.service';
+import { ApiNotesService } from '../../services/api-notes.service';
+import { AuthenticationService } from '../../services/authentication.service';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+
+import { INote, INoteContent } from '../../types/INote-types';
+import { IUser, IUserShareOption } from '../../types/IUser-types';
 
 
 @Component({
@@ -35,7 +33,7 @@ import { ServerService } from '../../services/server.service';
     templateUrl: './note-details.component.html',
     styleUrl: './note-details.component.scss'
 })
-export class NoteDetailsComponent implements OnInit {
+export class NoteDetailsComponent implements OnInit, OnDestroy {
 
     loading!: boolean;
     error!: string;
@@ -61,11 +59,13 @@ export class NoteDetailsComponent implements OnInit {
         'add': this.apiNotesService.postRequest.bind(this.apiNotesService)
     }
 
+    private subscriptions: Subscription[] = [];
+
 
     constructor(
-        public dialogRef: MatDialogRef<NoteDetailsComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialog: MatDialog,
+        public dialogRef: MatDialogRef<NoteDetailsComponent>,
         private apiNotesService: ApiNotesService,
         private apiUsersService: ApiUsersService,
         private authService: AuthenticationService,
@@ -74,8 +74,6 @@ export class NoteDetailsComponent implements OnInit {
     ) {}
 
     
-
-
     ngOnInit() {
         this.editForm = new FormGroup({
             titleField: new FormControl('', [Validators.required, Validators.maxLength(MaxNoteTitleLength)]),
@@ -93,7 +91,7 @@ export class NoteDetailsComponent implements OnInit {
             return;
         }
         this.isLoggedIn = true;
-        this.apiUsersService.getAll(user.userId)
+        const subscription = this.apiUsersService.getAll(user.userId)
         .subscribe({
             next: (users: IUser[]) => {
                 this.users = users.map((u: IUser) => ({ 
@@ -109,6 +107,7 @@ export class NoteDetailsComponent implements OnInit {
                 this.initMode();
             }
         });
+        this.subscriptions.push(subscription)
     }
 
 
@@ -121,7 +120,7 @@ export class NoteDetailsComponent implements OnInit {
             this.createdBy = null;
             return;
         }
-        this.apiNotesService.getById(+this.data.noteId)
+        const subscription = this.apiNotesService.getById(+this.data.noteId)
         .subscribe({
             next: (note: INote | undefined) => {
                 if (note) {
@@ -139,6 +138,7 @@ export class NoteDetailsComponent implements OnInit {
                 console.error(err);
             }
         });
+        this.subscriptions.push(subscription);
     }
 
 
@@ -168,13 +168,20 @@ export class NoteDetailsComponent implements OnInit {
     onFileChange(event: any) {
         const file = event.target.files[0];
         if (file) {
+            if (file.name) {
+                const fileName = file.name;
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+                if (!['jpg', 'png'].includes(fileExtension)) {
+                    this.error = `only jpg and png image files are acceptable.`
+                    return; 
+                }
+            }
             if (file.size > MaxUploadFileSize) {
                 this.error = `file is too large. max file size is ${(MaxUploadFileSize/1024)}kB.`
                 return; 
             }
             this.serverService.encodeFile(file).then((encodedFile: string) => {
                 this.encodedImg = encodedFile;
-                console.log(encodedFile);
             });
         }
     }
@@ -193,7 +200,7 @@ export class NoteDetailsComponent implements OnInit {
         }
         this.note.content.push(noteContent);
         this.note.version = this.note.content.length - 1;
-        this.actions[this.mode](this.note)
+        const subscription = this.actions[this.mode](this.note)
         .subscribe({
             next: () => {
                 if (this.mode === 'add') {
@@ -205,6 +212,7 @@ export class NoteDetailsComponent implements OnInit {
                 console.error(err)
             }
         })
+        this.subscriptions.push(subscription);
     }
 
 
@@ -224,7 +232,7 @@ export class NoteDetailsComponent implements OnInit {
         this.openConfirmationDialog(
             'Are You sure you would like to delete this note?',
             () => {
-                this.apiNotesService.deleteRequest(this.note.noteId)
+                const subscription = this.apiNotesService.deleteRequest(this.note.noteId)
                 .subscribe({
                     next: () => {
                         this.dialogRef.close(true);
@@ -233,7 +241,7 @@ export class NoteDetailsComponent implements OnInit {
                         console.error(err)
                     }
                 })
-                
+                this.subscriptions.push(subscription);
             }
         )
     }
@@ -253,16 +261,17 @@ export class NoteDetailsComponent implements OnInit {
                 message: message
             }
         });
-        dialogRef.afterClosed().subscribe(result => {
+        const subscription = dialogRef.afterClosed().subscribe(result => {
             if (result === true) {
                 if (callback) callback();
             }
-        })   
+        });
+        this.subscriptions.push(subscription);
     }
 
 
-    
-
-    
+    ngOnDestroy() {
+        this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    }
 
 }

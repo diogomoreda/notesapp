@@ -9,11 +9,14 @@ import { IAllData } from '../types/types';
 })
 export class ServerService {
 
+    // writes and reads the following keys from localStorage
+    // notesapp_user 
+    // notesapp_users 
+    // notesapp_data
     constructor(
         private encryptionService: EncryptionService
     ) {}
-    // notesapp_users 
-    // notesapp_data
+    
 
     private getNoteLink(noteId: number) {
         return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/note/${noteId}`;
@@ -84,6 +87,7 @@ export class ServerService {
 
             this.serverSetUsers(users);
             console.log('SERVER RESET SCRIPT: user seeds written in localStorage');
+            
             if (localStorage.getItem('notesapp_data') === null) {
                 this.serverSetData(data);
                 console.log('SERVER RESET SCRIPT: data seeds written in localStorage');
@@ -200,14 +204,4 @@ export class ServerService {
         })
     }
 
-    async decodeFile(file: File): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const base64Image = reader.result;
-                resolve(base64Image as string);
-            }
-            reader.readAsDataURL(file);
-        })
-    }
 }

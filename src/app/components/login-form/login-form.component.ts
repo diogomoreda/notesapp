@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ClickOutsideDirective } from '../../directives/click-outside.directive';
-import { GlobalService } from '../../services/global.service';
+import { Subscription } from 'rxjs';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { ILoginCredentials } from '../../types/types';
+import { ClickOutsideDirective } from '../../directives/click-outside.directive';
+import { GlobalService } from '../../services/global.service';
 import { AuthenticationService } from '../../services/authentication.service';
-
+import { ILoginCredentials } from '../../types/types';
 
 
 @Component({
@@ -21,7 +21,7 @@ import { AuthenticationService } from '../../services/authentication.service';
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss'
 })
-export class LoginFormComponent 
+export class LoginFormComponent implements OnDestroy
 {
     @Output() clickOutsideEmitter = new EventEmitter<void>();
     
@@ -34,6 +34,8 @@ export class LoginFormComponent
     };
 
     loggedIn: boolean = false;
+
+    private subscriptions: Subscription[] = [];
     
     constructor(
         private authService: AuthenticationService,
@@ -57,7 +59,7 @@ export class LoginFormComponent
     async onLoginSubmit() {
         this.loading = true;
         this.error = '';
-        this.authService.login(this.formData)
+        const subscription = this.authService.login(this.formData)
         .subscribe({
             next: (loginResponse: boolean) => {
                 if (loginResponse) {
@@ -72,11 +74,13 @@ export class LoginFormComponent
                 this.initForm()
             }
         });
+        this.subscriptions.push(subscription);
     }
 
     async onLogoutSubmit() {
         this.loading = true;
-        this.authService.logout().subscribe({
+        const subscription = this.authService.logout()
+        .subscribe({
             next: () => {
                 this.loading = false;
                 this.initForm();
@@ -87,13 +91,20 @@ export class LoginFormComponent
                 this.error = error.message;
                 this.loading = false;
             }
-        })
+        });
+        this.subscriptions.push(subscription);
     }
 
 
     onClickedOutside() {
         this.clickOutsideEmitter.emit();
     }
+
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////
     //

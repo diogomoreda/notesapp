@@ -1,4 +1,3 @@
-import { IUserType } from "./IUser-types";
 
 export type INoteType = 'reminder' | 'todo' | 'contact';
 

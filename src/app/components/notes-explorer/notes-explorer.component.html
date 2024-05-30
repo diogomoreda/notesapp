@@ -1,15 +1,12 @@
 
 <div class="notes-explorer">
-
     <header>
         <div class="filter-bar">
             <form [formGroup]="searchForm">
-            
                 <mat-form-field>
                     <mat-label>Search:</mat-label>
                     <input matInput formControlName="stringSearchField">
                 </mat-form-field>
-    
                 <mat-form-field>
                     <mat-label>Note Type:</mat-label>
                     <mat-select formControlName="selectedNoteType" name="selectedNoteType" multiple>
@@ -18,7 +15,6 @@
                         }
                     </mat-select>
                 </mat-form-field>
-    
                 <mat-form-field *ngIf="loggedIn">
                     <mat-label>Access Type:</mat-label>
                     <mat-select formControlName="selectedAccessType" name="selectedAccessType" multiple>
@@ -27,7 +23,6 @@
                         }
                     </mat-select>
                 </mat-form-field>
-    
                 <mat-form-field>
                     <mat-label>Order by:</mat-label>
                     <mat-select color="basic" formControlName="selectedSort" name="selectedSort">
@@ -36,92 +31,50 @@
                         }
                     </mat-select>
                 </mat-form-field>
-                
                 <mat-radio-group formControlName="selectedOrder" name="selectedOrder">
                     <mat-radio-button *ngFor="let sortOrder of sortOrders" [value]="sortOrder.value">{{sortOrder.label}}</mat-radio-button>
                 </mat-radio-group>
-                
             </form>
         </div>
         <button mat-mini-fab color="basic" type="button" (click)="clearFilters()" class="button-filter-clear" title="click to clear all filters"><mat-icon>clear</mat-icon></button>
     </header>
-
     <div class="content">
         <div class="area">
             <div class="wrapper">
                 <div class="page">
-
-                    <mat-grid-list cols="3" rowHeight="4:4" gutterSize="16px">
+                    <mat-grid-list *ngIf="notes.length" cols="3" rowHeight="4:4" gutterSize="16px">
                         <mat-grid-tile *ngFor="let note of notes">
-                            
                             <div class="grid-card" (click)="loadNoteDialog(note.noteId)">
-                                
                                 <div *ngIf="note.content[note.version].imgUrl" class="card-bg">
                                     <img [src]="note.content[note.version].imgUrl">
                                 </div>
-
                                 <div class="card-fg">
-                                    
                                     <div class="note-type">
                                         <mat-icon *ngIf="note.content[note.version].noteType === 'reminder'">add_alert</mat-icon>
                                         <mat-icon *ngIf="note.content[note.version].noteType === 'todo'">playlist_add_check_circle</mat-icon>
                                         <mat-icon *ngIf="note.content[note.version].noteType === 'contact'">perm_contact_cal</mat-icon>
                                         <span *ngIf="note.content[note.version].noteType">{{note.content[note.version].noteType}}</span>
                                     </div>
-
                                     <header>
                                         <h4>{{note.content[note.version].title}}</h4>
                                     </header>
-                                    
-                                    
                                     <footer>
                                         <div>Last updated</div>
                                         <p>{{note.content[note.version].updated | date:'mediumDate'}}&nbsp;-&nbsp;{{note.content[note.version].updated | date:'mediumTime'}}</p>
                                     </footer>
-
-                                </div>
-                                
+                                </div>    
                             </div>
-                            
-                            <!--<
-                            mat-card (click)="loadNoteDialog(note.noteId)">
-                                <mat-card-header>
-                                    <mat-card-title>{{note.content[note.version].title}}</mat-card-title>
-                                </mat-card-header>
-                                <img *ngIf="note.content[note.version].imgUrl" mat-card-image [src]="note.content[note.version].imgUrl" alt="{{note.content[note.version].title}}">
-                                <mat-card-content>
-                                    <div *ngIf="note.content[note.version].imgUrl" class="note-image">
-                                        <img [src]="note.content[note.version].imgUrl">
-                                    </div>
-                                    <div *ngIf="note.content[note.version].noteType" class="note-type">
-                                        <mat-icon *ngIf="note.content[note.version].noteType === 'reminder'">add_alert</mat-icon>
-                                        <mat-icon *ngIf="note.content[note.version].noteType === 'todo'">playlist_add_check_circle</mat-icon>
-                                        <mat-icon *ngIf="note.content[note.version].noteType === 'contact'">perm_contact_cal</mat-icon>
-                                        <span>{{note.content[note.version].noteType}}</span>
-                                    </div>
-                                    
-                                    <div>
-                                        <div>Last updated</div>
-                                        <p>{{note.content[note.version].updated | date:'mediumDate'}}&nbsp;-&nbsp;{{note.content[note.version].updated | date:'mediumTime'}}</p>
-                                    </div>
-                                </mat-card-content>
-                            </mat-card>
-                            -->
-                        
                         </mat-grid-tile>
-                    </mat-grid-list>
-            
+                    </mat-grid-list>    
+                    <div *ngIf="!notes.length" class="no-results">No available Notes to be displayed</div>
                 </div>
             </div>
         </div>
     </div>
-
     <footer>
         <a class="link-mail" href="mailto:diogomoreda@gmail.com?subject=Cocus%20Test%20Feedback&body=Your%20Message">diogomoreda&#64;gmail.com</a>
     </footer>
-
     <button mat-mini-fab color="basic" class="button-add" aria-label="add row" (click)="onAddClick()" title="click to add a new note">
         <mat-icon>add</mat-icon>
     </button>
-
 </div>

@@ -1,17 +1,12 @@
 <div clickOutside (clickOutside)="onClickedOutside()" class="login-box">
     <div *ngIf="!loggedIn">
-
         <form class="login-form" (ngSubmit)="onLoginSubmit()">
-
-            <!-- USERNAME -->
             <div>
                 <mat-form-field appearance="fill">
                     <mat-label>Username</mat-label>
                     <input type="text" name="username" matInput [(ngModel)]="formData.username" required [disabled]="loading">
                 </mat-form-field>
             </div>
-
-            <!-- PASSWORD -->
             <div>    
                 <mat-form-field appearance="fill">
                     <mat-label>Password</mat-label>
@@ -19,25 +14,20 @@
                     [disabled]="loading">
                 </mat-form-field>    
             </div>
-
             <mat-error *ngIf="error">{{error}}</mat-error>
-
-            <button mat-flat-button color="primary" type="submit" [disabled]="loading">Login</button>
-
+            <button mat-flat-button color="primary" type="submit" [disabled]="loading" title="clicl to login">Login</button>
             <div class="debug-data">
                 <div>Debug helper:</div>
-                <button (click)="fillForm('jon', 'password')" type="button">Jon</button>
-                <button (click)="fillForm('paul', 'password')" type="button">Paul</button>
-                <button (click)="fillForm('peter', 'password')" type="button">Peter</button>
-                <button (click)="fillForm('mary', 'password')" type="button">Mary</button>
+                <button (click)="fillForm('jon', 'password')" type="button" title="click to use this credentials">Jon</button>
+                <button (click)="fillForm('paul', 'password')" type="button" title="click to use this credentials">Paul</button>
+                <button (click)="fillForm('peter', 'password')" type="button" title="click to use this credentials">Peter</button>
+                <button (click)="fillForm('mary', 'password')" type="button" title="click to use this credentials">Mary</button>
             </div>
-            
         </form>
-        
     </div>
     <div *ngIf="loggedIn">
         <form (ngSubmit)="onLogoutSubmit()">
-            <button mat-flat-button type="submit" [disabled]="loading">Logout</button>
+            <button mat-flat-button type="submit" [disabled]="loading" title="click to logout">Logout</button>
         </form>
     </div>
 </div>

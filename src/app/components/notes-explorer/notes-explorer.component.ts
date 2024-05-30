@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, SelectControlValueAccessor, Validators } from '@angular/forms'; // Import FormsModule
 import { Observable, Subscription, combineLatest, debounceTime, distinctUntilChanged, map, merge, mergeAll } from 'rxjs';
 
@@ -13,18 +14,16 @@ import { MatSelectModule} from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-
+import { noteTypes, accessTypes, sortOptions, sortOrders } from '../../configuration/configuration';
 import { ApiNotesService } from '../../services/api-notes.service';
+import { GlobalService } from '../../services/global.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { NoteDetailsComponent } from '../note-details/note-details.component';
-
-import { noteTypes, accessTypes, sortOptions, sortOrders } from '../../data/options';
 
 import { INote, INoteType } from '../../types/INote-types';
 import { INoteSortOption, ISearchFilter, ISortOrder } from '../../types/types';
 import { IUserType } from '../../types/IUser-types';
-import { ActivatedRoute, Router } from '@angular/router';
-import { GlobalService } from '../../services/global.service';
-import { AuthenticationService } from '../../services/authentication.service';
+
 
 @Component({
   selector: 'notes-explorer',
@@ -33,7 +32,7 @@ import { AuthenticationService } from '../../services/authentication.service';
   templateUrl: './notes-explorer.component.html',
   styleUrl: './notes-explorer.component.scss'
 })
-export class NotesExplorerComponent implements OnInit
+export class NotesExplorerComponent implements OnInit, OnDestroy
 {
     notes: INote[] = [];
     searchForm!: FormGroup;
@@ -47,6 +46,7 @@ export class NotesExplorerComponent implements OnInit
     loggedIn!: boolean;
     private reloadSubscription!: Subscription;
     private loginSubscription!: Subscription;
+    private subscriptions: Subscription[] = [];
 
     constructor(
         public dialog: MatDialog,
@@ -60,8 +60,8 @@ export class NotesExplorerComponent implements OnInit
 
     ngOnInit(): void {
         this.loggedIn = this.authService.isLoggedIn();
-        console.log('ngOnInit', this.loggedIn);
-        this.apiNotesService.getRequest(this.searchFilter)
+        //console.log('ngOnInit', this.loggedIn);
+        const subscription = this.apiNotesService.getRequest(this.searchFilter)
         .subscribe({
             next: (response: INote[]) => {
                 this.notes = response;
@@ -73,6 +73,7 @@ export class NotesExplorerComponent implements OnInit
                 console.error(e);
             }
         });
+        this.subscriptions.push(subscription);
     }
 
 
@@ -91,7 +92,7 @@ export class NotesExplorerComponent implements OnInit
         const selectedSort$: Observable<INoteSortOption> = this.searchForm.get('selectedSort')!.valueChanges;
         const selectedOrder$: Observable<ISortOrder> = this.searchForm.get('selectedOrder')!.valueChanges;
         
-        merge(
+        const subscription = merge(
             stringSearchField$,
             selectedNoteType$,
             selectedAccessType$,
@@ -106,21 +107,25 @@ export class NotesExplorerComponent implements OnInit
                 sortOrder: this.searchForm.get('selectedOrder')!.value
             };
             this.getNotes();
-        })
-        
+        });
+        this.subscriptions.push(subscription);
     }
 
 
     private setupQueryParser() {
-        this.route.paramMap.subscribe(params => {
+        const subscription = this.route.paramMap
+        .subscribe(params => {
             const noteId = params.get('id');
             if (!noteId) return;
             const dialogRef = this.openNoteDialog(+noteId);
-            dialogRef.afterClosed().subscribe(result => {
+            const sub = dialogRef.afterClosed()
+            .subscribe(result => {
                 this.router.navigate(['/'], { queryParams: null });
-                //if (result === true) this.getNotes();
+                if (result === true) this.getNotes();
             });
+            this.subscriptions.push(sub);
         });
+        this.subscriptions.push(subscription);
     }
 
 
@@ -129,8 +134,7 @@ export class NotesExplorerComponent implements OnInit
             this.getNotes();
         });
         this.loginSubscription = this.authService.login$.subscribe((state: boolean) => {
-            console.log('is user logged in? ', state);
-            //this.loggedIn = state;
+            // console.log('is user logged in? ', state);
             this.loggedIn = this.authService.isLoggedIn();
         })
     }
@@ -138,7 +142,7 @@ export class NotesExplorerComponent implements OnInit
 
     private getNotes(): void {
         //console.log(this.searchFilter);
-        this.apiNotesService.getRequest(this.searchFilter)
+        const subscription = this.apiNotesService.getRequest(this.searchFilter)
         .subscribe({
             next: (response: INote[]) => {
                 this.notes = response;
@@ -147,6 +151,7 @@ export class NotesExplorerComponent implements OnInit
                 console.error(e);
             }
         });
+        this.subscriptions.push(subscription);
     }
 
 
@@ -163,9 +168,11 @@ export class NotesExplorerComponent implements OnInit
 
     loadNoteDialog(noteId: number) {
         const dialogRef = this.openNoteDialog(+noteId);
-        dialogRef.afterClosed().subscribe(result => {
+        const subscription = dialogRef.afterClosed()
+        .subscribe(result => {
             if (result === true) this.getNotes();
         });
+        this.subscriptions.push(subscription);
     }
 
 
@@ -191,12 +198,16 @@ export class NotesExplorerComponent implements OnInit
                 mode: 'add'
             }
         });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result === true) {
-                this.getNotes();
-            }
-        })   
+        const subscription = dialogRef.afterClosed()
+        .subscribe(result => {
+            if (result === true) this.getNotes();
+        }) 
+        this.subscriptions.push(subscription);  
     }
     
+
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    }
 
 }

@@ -16,6 +16,7 @@ export class ApiNotesService {
         private authService: AuthenticationService
     ) { }
 
+
     nextId(): number {
         const pool: INote[] = this.serverService.serverGetData();
         const noteIds: number[] = pool.map(i => i.noteId);
@@ -47,16 +48,6 @@ export class ApiNotesService {
         return of(this.serverService.serverGetData())
         .pipe(
             map((notes: INote[]) => {
-                
-                // filter by: userId   display notes from a single user
-                // filter by: userType display notes from a user type group (the public property must be true for this to be included)
-                // filter by: active   displays non deleted Notes
-                // filter by: public
-
-                // filter by: title
-                // filter by: content
-                // filter by: userType
-                // filter by: noteType
                 
                 // 1. filter out deleted notes
                 let filteredNotes: INote[] = notes.filter((note: INote) => note.active );
@@ -108,11 +99,7 @@ export class ApiNotesService {
                     ))
                 }
                 
-
-                // sort by: title alphabetically
-                // sort by: content alphabetically 
-                // sort by: created
-                // sort by: updated
+                // 5. sort by: title alphabetically, content alphabetically, created, updated
                 const sortedNotes: INote[] = filteredNotes.sort((noteA: INote, noteB: INote) => {
                     // sort by updated date / time
                     if (searchFilter.sortOption === 'updated') {
@@ -136,6 +123,8 @@ export class ApiNotesService {
                     }
                     return 0;
                 });
+
+                // 6. sort order: invert if required
                 if (searchFilter.sortOrder === 'desc') sortedNotes.reverse();
 
                 return sortedNotes;

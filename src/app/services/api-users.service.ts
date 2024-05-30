@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ServerService } from './server.service';
-import { AuthenticationService } from './authentication.service';
 import { Observable, catchError, filter, map, of } from 'rxjs';
 import { INote, INoteContent, INoteType } from '../types/INote-types';
 import { IUser, IUserType } from '../types/IUser-types';
 import { INoteSortOption, ISearchFilter, ISortOrder } from '../types/types';
+
 
 @Injectable({
     providedIn: 'root'
@@ -12,8 +12,7 @@ import { INoteSortOption, ISearchFilter, ISortOrder } from '../types/types';
 export class ApiUsersService {
 
     constructor(
-        private serverService: ServerService,
-        private authService: AuthenticationService
+        private serverService: ServerService
     ) { }
 
 
@@ -28,6 +27,7 @@ export class ApiUsersService {
             }) 
         );
     }
+
 
     getAll(excludeId?: number): Observable<IUser[]> {
         if (!excludeId) excludeId = -1;
@@ -45,4 +45,5 @@ export class ApiUsersService {
             }) 
         );
     }
+    
 }

@@ -1,23 +1,16 @@
 <div class="note-details">
-
     <div *ngIf="!hasAccess" class="note-details-body note-details-warning">
         <p>You do not have access to this note.</p>
     </div>
-
     <div *ngIf="hasAccess && mode === 'view'" class="note-details-body note-details-view">
-
         <header>
             <h3>{{note.content[note.version].title}}</h3>
             <div>{{note.content[note.version].noteType}}</div>
         </header>
-
         <div class="content">
             <markdown>{{note.content[note.version].content}}</markdown>
         </div>
-        <div *ngIf="encodedImg" class="content image-preview" [ngStyle]="{'background-image': encodedImgUrl }">
-
-        </div>
-
+        <div *ngIf="encodedImg" class="content image-preview" [ngStyle]="{'background-image': encodedImgUrl }"></div>
         <footer>
             <div *ngIf="createdBy">
                 <label>Created By:</label>
@@ -45,7 +38,6 @@
                 <label>Link:</label>
                 <a href="{{noteLink}}" target="_blank">{{noteLink}}</a>
             </div>
-
             <div class="footer-control">
                 <div *ngIf="isOwner">
                     <button mat-flat-button color="primary" type="button" (click)="onEditClick()">Edit</button>
@@ -56,18 +48,13 @@
             </div>
         </footer>
     </div>
-
-
     <div *ngIf="isOwner && (mode === 'add' || mode === 'edit')" class="note-details-body note-details-edit">
-
         <form [formGroup]="editForm" class="note-details-body note-details-edit">
-
             <header>
                 <mat-form-field>
                     <mat-label>Title:</mat-label>
                     <input matInput formControlName="titleField">
                 </mat-form-field>
-
                 <mat-form-field>
                     <mat-label>Note Type:</mat-label>
                     <mat-select formControlName="selectedNoteType" name="selectedNoteType">
@@ -77,36 +64,28 @@
                         }
                     </mat-select>
                 </mat-form-field>
-
             </header>
-
             <div class="content">
                 <div>
-                    
                     <mat-form-field appearance="fill">
                         <mat-label>Content (Markdown supported)</mat-label>
                         <textarea matInput placeholder="Enter your note contents here" rows="7" formControlName="contentField"></textarea>
                     </mat-form-field>
-
                 </div>
             </div>
-
             <div class="file-input">
                 <div class="field">
-                    <div><mat-label>choose a file to upload</mat-label></div>
+                    <div><mat-label>choose an image file to upload ('jpg' or 'png')</mat-label></div>
                     <div><input type="file" (change)="onFileChange($event)"></div>
                 </div>
                 <div class="placeholder">
                     <img *ngIf="encodedImg" [src]="encodedImg" alt="image uploaded for this note">
                 </div>
             </div>
-
+            <div *ngIf="error"><mat-error>{{error}}</mat-error></div>
         </form>
-
         <footer>
-            
             <div class="footer-utils">
-
                 <div class="note-sharing">
                     <div class="note-sharing-label">Note Sharing:</div>
                     <div class="note-sharing-box" *ngIf="isLoggedIn">
@@ -117,10 +96,9 @@
                         </ul>
                     </div>
                     <div class="note-sharing-box" *ngIf="!isLoggedIn">
-                        <p>Only logged in users may share their notes with other registered users.</p>
+                        <p>Once saved, this note will be public, and accessible to everyone. Only logged in users may create private notes and share them with other registered users.</p>
                     </div>
                 </div>
-
                 <div class="note-revision">
                     <div>Revisions:</div>
                     <div class="note-revision-box">
@@ -129,9 +107,7 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
             <div class="footer-control">
                 <div>
                     <button *ngIf="mode === 'edit'" mat-flat-button color="primary" type="button" (click)="onDeleteClick()" title="click to delete this note">Delete</button>
@@ -140,10 +116,6 @@
                     <button mat-flat-button color="primary" type="button" (click)="onSaveClick()" title="click to save your changes">Save</button>
                 </div>
             </div>
-            
         </footer>
-
     </div>
-
-
 </div>

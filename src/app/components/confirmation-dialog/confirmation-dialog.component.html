@@ -2,9 +2,7 @@
     class="confirmation-dialog"
     clickOutside 
     (clickOutside)="onClickedOutside()">
-
     <div class="dialog-content" [innerHTML]="data.message"></div>
-
     <footer>
         <button mat-flat-button color="primary" type="button" (click)="cancel()">Cancel</button>
         <button mat-flat-button color="primary" type="button" (click)="confirm()">Confirm</button>

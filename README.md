@@ -1,7 +1,5 @@
 # Notesapp
 
-This angular project contains a solution for the Cocus FrontEnd challenge, consisting of a multi user note creation and sharing platform.
-
 The app is used to create and share notes.
 Notes are simple pieces of data containing a title, a type, some markdown content and one image.
 Notes can be acessed directly on the UI (clicking a card), or by url.
